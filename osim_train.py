@@ -41,7 +41,7 @@ def run_task(*_):
 run_experiment_lite(
     run_task,
     # Number of parallel workers for sampling
-    n_parallel=1,
+    n_parallel=4,
     # Only keep the snapshot parameters for the last iteration
     snapshot_mode="all",
     # Specifies the seed for the experiment. If this is not provided, a random seed
