@@ -128,5 +128,5 @@ class NPO(BatchPolopt):
             itr=itr,
             policy=self.policy,
             baseline=self.baseline,
-            env=self.env,
+            # env=self.env,
         )
