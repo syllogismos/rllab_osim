@@ -37,17 +37,17 @@ def run_task(*_):
     )
     algo.train()
 
-
-run_experiment_lite(
-    run_task,
-    # Number of parallel workers for sampling
-    n_parallel=4,
-    # Only keep the snapshot parameters for the last iteration
-    snapshot_mode="all",
-    # Specifies the seed for the experiment. If this is not provided, a random seed
-    # will be used
-    seed=1,
-    # plot=True,
-    exp_name='osim',
-#     log_dir='my_exps'
-)
+if __name__ == '__main__':
+    run_experiment_lite(
+        run_task,
+        # Number of parallel workers for sampling
+        n_parallel=4,
+        # Only keep the snapshot parameters for the last iteration
+        snapshot_mode="all",
+        # Specifies the seed for the experiment. If this is not provided, a random seed
+        # will be used
+        seed=1,
+        # plot=True,
+        exp_name='osim',
+    #     log_dir='my_exps'
+    )
