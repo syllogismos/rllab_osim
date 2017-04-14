@@ -117,7 +117,7 @@ class BatchPolopt(RLAlgorithm):
         self.init_opt()
         for itr in range(self.current_itr, self.n_itr):
             with logger.prefix('itr #%d | ' % itr):
-                paths = self.sampler.obtain_samples(itr)
+                paths = self.get_paths(itr)
                 samples_data = self.sampler.process_samples(itr, paths)
                 self.log_diagnostics(paths)
                 self.optimize_policy(itr, samples_data)
@@ -137,6 +137,9 @@ class BatchPolopt(RLAlgorithm):
                                   "continue...")
 
         self.shutdown_worker()
+
+    def get_paths(self, itr):
+        return self.sampler.obtain_samples(itr)
 
     def log_diagnostics(self, paths):
         self.env.log_diagnostics(paths)

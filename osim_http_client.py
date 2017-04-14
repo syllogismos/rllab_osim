@@ -15,8 +15,9 @@ class Client(object):
     """
     Gym client to interface with gym_http_server
     """
-    def __init__(self):
-        self.remote_base = 'http://127.0.0.1:5000'
+    def __init__(self, p=0):
+        port = 5000 + p
+        self.remote_base = 'http://127.0.0.1:' + str(port)
         self.session = requests.Session()
         self.session.headers.update({'Content-type': 'application/json'})
         self.env_create()

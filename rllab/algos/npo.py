@@ -5,7 +5,11 @@ import rllab.misc.logger as logger
 import theano
 import theano.tensor as TT
 from rllab.optimizers.penalty_lbfgs_optimizer import PenaltyLbfgsOptimizer
-
+from multiprocessing import Pool
+from rllab.envs.normalized_env import normalize
+from osim_http_client import Client
+from rllab.sampler.utils import rollout
+from itertools import chain
 
 class NPO(BatchPolopt):
     """
@@ -18,6 +22,7 @@ class NPO(BatchPolopt):
             optimizer_args=None,
             step_size=0.01,
             truncate_local_is_ratio=None,
+            threads=1,
             **kwargs
     ):
         if optimizer is None:
@@ -27,7 +32,9 @@ class NPO(BatchPolopt):
         self.optimizer = optimizer
         self.step_size = step_size
         self.truncate_local_is_ratio = truncate_local_is_ratio
+        self.threads = threads
         super(NPO, self).__init__(**kwargs)
+        self.parallel_envs = [self.env] + map(lambda x: normalize(Client(x)), range(1, threads))
 
     @overrides
     def init_opt(self):
@@ -130,3 +137,19 @@ class NPO(BatchPolopt):
             baseline=self.baseline,
             # env=self.env,
         )
+
+    @overrides
+    def get_paths(self, itr):
+        p = Pool(self.threads)
+        parallel_paths = p.map(self.get_paths_from_env, enumerate(self.parallel_envs))
+        p.close()
+        p.join()
+        print (len(parallel_paths), 'number of episodes')
+        return list(chain(*parallel_paths))
+    
+    def get_paths_from_env(self, thread_env):
+        num_episodes_per_thread = self.batch_size // self.max_path_length // self.threads
+        ext.set_seed(thread_env[0])
+        paths = [rollout(thread_env[1], self.policy, self.max_path_length)\
+            for x in range(num_episodes_per_thread)]
+        return paths
