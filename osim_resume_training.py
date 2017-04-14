@@ -45,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--resume_from', type=str,
                         help='path of pickled file')
     parser.add_argument(
-        '--exp_name', type=str, default=default_exp_name, help='Name of the experiment.')
+        '--exp_name', type=str, help='Name of the experiment.')
     args = parser.parse_args()
     params = joblib.load(args.resume_from)
     run_experiment_lite(
