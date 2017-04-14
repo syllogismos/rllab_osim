@@ -32,7 +32,7 @@ def run_task(*_):
         n_itr=100,
         discount=0.99,
         step_size=0.005,
-        threads=4,
+        threads=7,
         # Uncomment both lines (this and the plot parameter below) to enable plotting
         # plot=True,
     )

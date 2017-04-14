@@ -145,6 +145,7 @@ class NPO(BatchPolopt):
         parallel_paths = p.map(self.get_paths_from_env, enumerate(self.parallel_envs))
         for job in parallel_paths:
             print(list(map(lambda x: tot_reward(x), job)))
+            print(list(map(lambda x: len_path(x), job)))
         print(len(parallel_paths), 'no of parallel jobs')
         print(len(parallel_paths[0]), 'no of paths in first job')
         print(len(parallel_paths[0][0]['rewards']), 'no of rewards in first path of first job')
@@ -164,3 +165,6 @@ class NPO(BatchPolopt):
 
 def tot_reward(path):
     return np.sum(path['rewards'])
+
+def len_path(path):
+    return len(path['rewards'])
