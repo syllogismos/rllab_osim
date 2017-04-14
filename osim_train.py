@@ -32,6 +32,7 @@ def run_task(*_):
         n_itr=100,
         discount=0.99,
         step_size=0.005,
+        threads=4,
         # Uncomment both lines (this and the plot parameter below) to enable plotting
         # plot=True,
     )
@@ -48,6 +49,6 @@ if __name__ == '__main__':
         # will be used
         seed=1,
         # plot=True,
-        exp_name='osim',
+        exp_name='parallel_osim',
     #     log_dir='my_exps'
     )
