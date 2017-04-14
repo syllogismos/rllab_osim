@@ -34,7 +34,7 @@ class NPO(BatchPolopt):
         self.truncate_local_is_ratio = truncate_local_is_ratio
         self.threads = threads
         super(NPO, self).__init__(**kwargs)
-        self.parallel_envs = [self.env] + map(lambda x: normalize(Client(x)), range(1, threads))
+        self.parallel_envs = [self.env] + list(map(lambda x: normalize(Client(x)), range(1, threads)))
 
     @overrides
     def init_opt(self):
