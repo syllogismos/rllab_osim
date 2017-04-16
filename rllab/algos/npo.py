@@ -214,7 +214,7 @@ class NPO(BatchPolopt):
         for i in range(0, threads):
             while True:
                 try:
-                    temp_env = normalize(Client(x))
+                    temp_env = normalize(Client(i))
                     self.parallel_envs.append(temp_env)
                     break
                 except Exception:
