@@ -51,7 +51,11 @@ if __name__ == '__main__':
     if args.seed is not None:
         set_seed(args.seed)
 
-    log_dir = osp.join(config.LOG_DIR, args.exp_name)
+    now = datetime.datetime.now(dateutil.tz.tzlocal())
+    timestamp = now.strftime('%Y_%m_%d_%H_%M_%S_%f_%Z')
+    rand_id = str(uuid.uuid4())[:5]
+    exp_name = '%s_%s_%s' % (args.exp_name, timestamp, rand_id)
+    log_dir = osp.join(config.LOG_DIR, exp_name)
     tabular_log_file = osp.join(log_dir, args.tabular_log_file)
     text_log_file = osp.join(log_dir, args.text_log_file)
     params_log_file = osp.join(log_dir, args.params_log_file)
