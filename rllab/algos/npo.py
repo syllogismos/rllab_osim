@@ -152,8 +152,9 @@ class NPO(BatchPolopt):
         print(np.sum(parallel_paths[0][0]['rewards']), 'total reward')
         p.close()
         p.join()
-        print (len(parallel_paths), 'number of episodes')
-        return list(chain(*parallel_paths))
+        all_paths = list(chain(*parallel_paths)) 
+        print(len(all_paths), 'total no of paths in this itr')
+        return all_paths
     
     def get_paths_from_env(self, thread_env):
         # num_episodes_per_thread = self.batch_size // self.max_path_length // self.threads
