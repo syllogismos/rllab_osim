@@ -42,6 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--discount', type=float, default=0.99)
     parser.add_argument('--step_size', type=float, default=0.005)
     parser.add_argument('--n_itr', type=int, default=100)
+    parser.add_argument('--args_data', default=None)
     # parser.add_argument('--variant_data', type=str)
 
 
