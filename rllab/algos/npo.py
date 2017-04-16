@@ -11,6 +11,8 @@ from osim_http_client import Client
 from rllab.sampler.utils import rollout
 from itertools import chain
 import numpy as np
+import time
+from osim_helpers import start_env_server
 
 class NPO(BatchPolopt):
     """
@@ -24,6 +26,8 @@ class NPO(BatchPolopt):
             step_size=0.01,
             truncate_local_is_ratio=None,
             threads=1,
+            first_env_server=None,
+            ec2=False,
             **kwargs
     ):
         if optimizer is None:
@@ -34,8 +38,25 @@ class NPO(BatchPolopt):
         self.step_size = step_size
         self.truncate_local_is_ratio = truncate_local_is_ratio
         self.threads = threads
+        self.ec2 = ec2
         super(NPO, self).__init__(**kwargs)
-        self.parallel_envs = [self.env] + list(map(lambda x: normalize(Client(x)), range(1, threads)))
+
+        print("Creating multiple env threads")
+        self.env_servers = [first_env_server] + list(map(lambda x: start_env_server(x, self.ec2), range(1, threads)))
+        time.sleep(10)
+
+        self.parallel_envs = [self.env] #+ list(map(lambda x: normalize(Client(x)), range(1, threads)))
+        for i in range(1, threads):
+            while True:
+                try:
+                    temp_env = normalize(Client(i))
+                    self.parallel_envs.append(temp_env)
+                    break
+                except Exception:
+                    print("Exception while creating env of port ", i)
+                    print("Trying to create env again")
+
+
 
     @overrides
     def init_opt(self):
@@ -175,6 +196,31 @@ class NPO(BatchPolopt):
         print(episodes, 'no of episodes in this thread')
         print([len(x['rewards']) for x in paths], 'episode lenghths in this thread')
         return paths
+
+    @overrides
+    def destroy_envs(self):
+        print("Destroying env servers")
+        for server in self.env_servers:
+            server.kill()
+        pass
+
+    @overrides
+    def create_envs(self):
+        print("Creating new env servers")
+        self.env_servers = list(map(lambda x: start_env_server(x, self.ec2), range(0, threads)))
+        time.sleep(10)
+        print("Creating new envs")
+        self.parallel_envs = []
+        for i in range(0, threads):
+            while True:
+                try:
+                    temp_env = normalize(Client(x))
+                    self.parallel_envs.append(temp_env)
+                    break
+                except Exception:
+                    print("Exception while creating env of port ", i)
+                    print("Trying to create env again")
+        pass
 
 def tot_reward(path):
     return np.sum(path['rewards'])

@@ -24,6 +24,8 @@ import sys
 import joblib
 
 from osim_http_client import Client
+from osim_helpers import start_env_server
+import time
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -43,6 +45,8 @@ if __name__ == '__main__':
     parser.add_argument('--step_size', type=float, default=0.005)
     parser.add_argument('--n_itr', type=int, default=100)
     parser.add_argument('--args_data', default=None)
+    parser.add_argument('--ec2', type=ast.literal_eval, default=False)
+    parser.add_argument('--destroy_env_every', type=int, default=5)
     # parser.add_argument('--variant_data', type=str)
 
 
@@ -78,7 +82,17 @@ if __name__ == '__main__':
     
 
     # training happens here based on args.resume_from
-    env = normalize(Client())
+    print("Creating the first env server")
+    env_server = start_env_server(p=0, ec2=args.ec2)
+    time.sleep(10)
+    print("Creating the first env")
+    while True:
+        try:
+            env = normalize(Client())
+            break
+        except:
+            print("Failed to create env at port 0")
+            print("Trying again")
 
     if args.resume_from is not None:
         params = joblib.load(args.resume_from)
@@ -94,6 +108,8 @@ if __name__ == '__main__':
     ### woo hooo training happening soo fasttt.. ultra fasttttt
     algo = TRPO(
         env=env,
+        first_env_server=env_server,
+        ec2=args.ec2,
         policy=policy,
         baseline=baseline,
         batch_size=args.batch_size,
@@ -101,7 +117,8 @@ if __name__ == '__main__':
         n_itr=args.n_itr,
         discount=args.discount,
         step_size=args.step_size,
-        threads=args.n_parallel
+        threads=args.n_parallel,
+        destroy_env_every=args.destroy_env_every
     )
 
     algo.train()

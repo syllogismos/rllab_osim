@@ -60,6 +60,7 @@ class BatchPolopt(RLAlgorithm):
             whole_paths=True,
             sampler_cls=None,
             sampler_args=None,
+            destroy_env_every=None,
             **kwargs
     ):
         """
@@ -103,6 +104,7 @@ class BatchPolopt(RLAlgorithm):
         if sampler_args is None:
             sampler_args = dict()
         self.sampler = sampler_cls(self, **sampler_args)
+        self.destroy_env_every = destroy_env_every
 
     def start_worker(self):
         self.sampler.start_worker()
@@ -116,6 +118,10 @@ class BatchPolopt(RLAlgorithm):
         self.start_worker()
         self.init_opt()
         for itr in range(self.current_itr, self.n_itr):
+            if self.destroy_env_every is not None:
+                if (itr !=0) and (itr % self.destroy_env_every == 0):
+                    self.destroy_envs()
+                    self.create_envs()
             with logger.prefix('itr #%d | ' % itr):
                 paths = self.get_paths(itr)
                 samples_data = self.sampler.process_samples(itr, paths)
@@ -140,6 +146,12 @@ class BatchPolopt(RLAlgorithm):
 
     def get_paths(self, itr):
         return self.sampler.obtain_samples(itr)
+
+    def destroy_envs(self):
+        pass
+    
+    def create_envs(self):
+        pass
 
     def log_diagnostics(self, paths):
         self.env.log_diagnostics(paths)
