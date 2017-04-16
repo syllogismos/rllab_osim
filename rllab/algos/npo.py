@@ -156,11 +156,23 @@ class NPO(BatchPolopt):
         return list(chain(*parallel_paths))
     
     def get_paths_from_env(self, thread_env):
-        num_episodes_per_thread = self.batch_size // self.max_path_length // self.threads
-        print(num_episodes_per_thread, 'no of episodes in this thread')
+        # num_episodes_per_thread = self.batch_size // self.max_path_length // self.threads
+        # print(num_episodes_per_thread, 'no of episodes in this thread')
+        # ext.set_seed(thread_env[0])
+        # paths = [rollout(thread_env[1], self.policy, self.max_path_length)\
+        #     for x in range(num_episodes_per_thread)]
+        thread_batch_size = self.batch_size // self.threads
+        paths = []
+        count = 0
+        episodes = 0
         ext.set_seed(thread_env[0])
-        paths = [rollout(thread_env[1], self.policy, self.max_path_length)\
-            for x in range(num_episodes_per_thread)]
+        while count < thread_batch_size:
+            cur_path = rollout(thread_env[1], self.policy, self.max_path_length)
+            count += len(cur_path['rewards'])
+            episodes += 1
+            paths.append(cur_path)
+        print(episodes, 'no of episodes in this thread')
+        print([len(x['rewards']), for x in paths], 'episode lenghths in this thread')
         return paths
 
 def tot_reward(path):
