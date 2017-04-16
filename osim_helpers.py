@@ -12,4 +12,4 @@ def start_env_server(p=0, ec2=False):
     command = server_script_path + ' -p ' + port
     process = subprocess.Popen(command, shell=True) 
     # subprocess.call(['source', 'activate', 'python3'])
-    return process
+    return process.pid

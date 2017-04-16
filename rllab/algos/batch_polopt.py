@@ -142,6 +142,9 @@ class BatchPolopt(RLAlgorithm):
                         input("Plotting evaluation run: Press Enter to "
                                   "continue...")
 
+        print("Destroying all the env servers")
+        self.destroy_envs()
+
         self.shutdown_worker()
 
     def get_paths(self, itr):

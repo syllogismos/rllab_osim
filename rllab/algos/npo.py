@@ -13,6 +13,7 @@ from itertools import chain
 import numpy as np
 import time
 from osim_helpers import start_env_server
+import psutil
 
 class NPO(BatchPolopt):
     """
@@ -200,18 +201,23 @@ class NPO(BatchPolopt):
     @overrides
     def destroy_envs(self):
         print("Destroying env servers")
-        for server in self.env_servers:
-            server.kill()
+        for pid in self.env_servers:
+            try:
+                process = psutil.Process(pid)
+                process.terminate()
+            except:
+                print("process doesnt exist", pid)
+                pass
         pass
 
     @overrides
     def create_envs(self):
         print("Creating new env servers")
-        self.env_servers = list(map(lambda x: start_env_server(x, self.ec2), range(0, threads)))
+        self.env_servers = list(map(lambda x: start_env_server(x, self.ec2), range(0, self.threads)))
         time.sleep(10)
         print("Creating new envs")
         self.parallel_envs = []
-        for i in range(0, threads):
+        for i in range(0, self.threads):
             while True:
                 try:
                     temp_env = normalize(Client(i))
