@@ -172,7 +172,7 @@ class NPO(BatchPolopt):
             episodes += 1
             paths.append(cur_path)
         print(episodes, 'no of episodes in this thread')
-        print([len(x['rewards']), for x in paths], 'episode lenghths in this thread')
+        print([len(x['rewards']) for x in paths], 'episode lenghths in this thread')
         return paths
 
 def tot_reward(path):
