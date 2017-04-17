@@ -206,6 +206,7 @@ class NPO(BatchPolopt):
             try:
                 process = psutil.Process(pid)
                 process.terminate()
+                process.wait()
             except:
                 print("process doesnt exist", pid)
                 pass
