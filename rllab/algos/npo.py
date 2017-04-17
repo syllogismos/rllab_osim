@@ -205,6 +205,9 @@ class NPO(BatchPolopt):
         for pid in self.env_servers:
             try:
                 process = psutil.Process(pid)
+                for child in process.children():
+                    child.terminate()
+                    child.wait()
                 process.terminate()
                 process.wait()
             except:
