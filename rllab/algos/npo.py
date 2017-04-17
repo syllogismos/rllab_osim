@@ -201,6 +201,7 @@ class NPO(BatchPolopt):
     @overrides
     def destroy_envs(self):
         print("Destroying env servers")
+        print(self.env_servers)
         for pid in self.env_servers:
             try:
                 process = psutil.Process(pid)
@@ -215,6 +216,8 @@ class NPO(BatchPolopt):
         print("Creating new env servers")
         self.env_servers = list(map(lambda x: start_env_server(x, self.ec2), range(0, self.threads)))
         time.sleep(10)
+        print("Created servers")
+        print(self.env_servers)
         print("Creating new envs")
         self.parallel_envs = []
         for i in range(0, self.threads):
