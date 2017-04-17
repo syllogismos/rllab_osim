@@ -15,12 +15,12 @@ class Client(object):
     """
     Gym client to interface with gym_http_server
     """
-    def __init__(self, p=0):
+    def __init__(self, p=0, visualize=False):
         port = 5000 + p
         self.remote_base = 'http://127.0.0.1:' + str(port)
         self.session = requests.Session()
         self.session.headers.update({'Content-type': 'application/json'})
-        self.env_create()
+        self.env_create(visualize=visualize)
 
     def _parse_server_error_or_raise_for_status(self, resp):
         j = {}
@@ -49,9 +49,9 @@ class Client(object):
         resp = self.session.get(url)
         return self._parse_server_error_or_raise_for_status(resp)
         
-    def env_create(self):
+    def env_create(self, visualize=False):
         route = '/v1/envs/'
-        data = {'env_id': 'lol'}
+        data = {'env_id': 'lol', 'visualize': visualize}
         resp = self._post_request(route, data)
         instance_id = resp['instance_id']
         self.instance_id = instance_id

@@ -55,10 +55,10 @@ class Envs(object):
         except KeyError:
             raise InvalidUsage('Instance_id {} unknown'.format(instance_id))
 
-    def create(self, env_id):
+    def create(self, env_id, visualize=False):
         try:
             # env = gym.make(env_id)
-            env = GaitEnv(visualize=False)
+            env = GaitEnv(visualize=visualize)
         except gym.error.Error:
             raise InvalidUsage("Attempted to look up malformed environment ID '{}'".format(env_id))
 
@@ -208,8 +208,10 @@ def env_create():
         used in future API calls to identify the environment to be
         manipulated
     """
-    env_id = get_required_param(request.get_json(), 'env_id')
-    instance_id = envs.create(env_id)
+    request_json = request.get_json()
+    env_id = get_required_param(request_json, 'env_id')
+    visualize = get_required_param(request_json, 'visualize')
+    instance_id = envs.create(env_id, visualize)
     return jsonify(instance_id = instance_id)
 
 @app.route('/v1/envs/', methods=['GET'])
